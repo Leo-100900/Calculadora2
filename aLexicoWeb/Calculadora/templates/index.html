@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center; 
+            align-items: flex-start; 
+            color: white;
+            background-color: black; 
+            padding: 20px; 
+        }
+        .calculator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 40px; 
+        }
+        .token-table {
+            text-align: left; 
+            color: white; 
+        }
+        table {
+            border-collapse: collapse;
+            margin-top: 20px; 
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #61dafb;
+            color: black; 
+        }
+    </style>
+</head>
+<body>
+    <div class="token-table">
+        {% if tokens %}
+            <table>
+                <tr>
+                    <th>Token</th>
+                    <th>Tipo</th>
+                </tr>
+                {% for token, tipo in tokens %}
+                <tr>
+                    <td>{{ token }}</td>
+                    <td>{{ tipo }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+
+    <div class="calculator">
+        <h1>Calculadora</h1>
+        <form action="/calculate" method="post" id="calcForm">
+            <input type="text" name="expression" id="expression" placeholder="Resultado" value="{{ result if result else '' }}" readonly required>
+            <div class="buttons">
+                <button type="button" onclick="clearExpression()">C</button>
+                <button type="button" onclick="appendToExpression('(')">(</button>
+                <button type="button" onclick="appendToExpression(')')">)</button>
+                <button type="button" onclick="appendToExpression('/')">/</button>
+                
+                <button type="button" onclick="appendToExpression('7')">7</button>
+                <button type="button" onclick="appendToExpression('8')">8</button>
+                <button type="button" onclick="appendToExpression('9')">9</button>
+                <button type="button" onclick="appendToExpression('*')">*</button>
+                
+                <button type="button" onclick="appendToExpression('4')">4</button>
+                <button type="button" onclick="appendToExpression('5')">5</button>
+                <button type="button" onclick="appendToExpression('6')">6</button>
+                <button type="button" onclick="appendToExpression('-')">-</button>
+                
+                <button type="button" onclick="appendToExpression('1')">1</button>
+                <button type="button" onclick="appendToExpression('2')">2</button>
+                <button type="button" onclick="appendToExpression('3')">3</button>
+                <button type="button" onclick="appendToExpression('+')">+</button>
+                
+                <button type="button" onclick="appendToExpression('0')">0</button>
+                <button type="button" onclick="appendToExpression('.')">.</button>
+                <button type="button" onclick="appendToExpression('ans')">ans</button>
+                <button type="button" onclick="calculateResult()">=</button>
+                <button type="button" onclick="submitTree()">tree</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function appendToExpression(value) {
+            document.getElementById('expression').value += value;
+        }
+        
+        function calculateResult() {
+            const expression = document.getElementById('expression').value;
+            document.forms['calcForm'].submit();
+        }
+
+        function submitTree() {
+            const expression = document.getElementById('expression').value;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/tree_data';
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'expression';
+            input.value = expression;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function clearExpression() {
+            document.getElementById('expression').value = '';
+        }
+    </script>
+</body>
+</html>
